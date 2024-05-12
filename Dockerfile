@@ -54,4 +54,4 @@ RUN npm install
 # Run Composer autoload generation
 RUN composer dump-autoload --optimize
 
-CMD php artisan migrate --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=$PORT
+CMD php artisan migrate --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=$PORT && npm run dev
