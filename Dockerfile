@@ -44,15 +44,20 @@ WORKDIR /var/www/html
 # Copy project files
 COPY . .
 
+# Verify the presence of composer.json
+RUN ls -la && \
+    test -f composer.json || (echo "composer.json not found!" && exit 1)
+
+# Verify the presence of package.json
+RUN test -f package.json || (echo "package.json not found!" && exit 1)
+
 # Modify php.ini settings
 RUN touch /usr/local/etc/php/conf.d/uploads.ini \
     && echo "upload_max_filesize = 10M;" >> /usr/local/etc/php/conf.d/uploads.ini
 
 # Serve the application
-RUN ls -la /var/www/html
-RUN composer --version
-RUN composer install
-RUN npm install
+RUN composer --version && composer install || (echo "Composer install failed!" && exit 1)
+RUN npm install || (echo "NPM install failed!" && exit 1)
 
 # Start the application
 CMD php artisan migrate --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=$PORT
