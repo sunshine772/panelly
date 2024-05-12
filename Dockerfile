@@ -24,13 +24,13 @@ RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set up node and npm
-
 RUN curl -sL https://deb.nodesource.com/setup_18.x | bash
 RUN apt-get update && apt-get -y install nodejs 
 
 # Set working directory
 WORKDIR /var/www
 
+# Install GD extension
 RUN apt-get update && apt-get install -y \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
@@ -38,11 +38,13 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd
 
+# Set working directory for Laravel
 WORKDIR /var/www/html
+
+# Copy project files
 COPY . .
 
-#Modify php.ini setings
-
+# Modify php.ini settings
 RUN touch /usr/local/etc/php/conf.d/uploads.ini \
     && echo "upload_max_filesize = 10M;" >> /usr/local/etc/php/conf.d/uploads.ini
 
@@ -50,5 +52,5 @@ RUN touch /usr/local/etc/php/conf.d/uploads.ini \
 RUN composer update
 RUN npm install
 
-CMD php artisan migrate --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=$PORT && npm run dev
-# CMD npm run build && composer update && php artisan optimize:clear && php artisan storage:link && php artisan migrate --force && php artisan passport:keys && php artisan serve --host=0.0.0.0 --port=$PORT
+# Start the application
+CMD php artisan migrate --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=$PORT & npm run dev
