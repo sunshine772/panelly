@@ -46,8 +46,8 @@ COPY . .
 RUN touch /usr/local/etc/php/conf.d/uploads.ini \
     && echo "upload_max_filesize = 10M;" >> /usr/local/etc/php/conf.d/uploads.ini
 
-#Serve the application
+# Serve the application
 
-# RUN composer install
-# RUN npm install
+RUN composer install
+RUN npm install
 CMD php artisan migrate --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=$PORT
