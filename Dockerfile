@@ -53,4 +53,4 @@ RUN composer update
 RUN npm install
 
 # Start the application
-CMD php artisan migrate --force && php artisan storage:link && npm run build & php artisan serve --host=0.0.0.0 --port=$PORT
+CMD php artisan migrate --force && php artisan storage:link && npm run dev --host=0.0.0.0 & php artisan serve --host=0.0.0.0 --port=$PORT
