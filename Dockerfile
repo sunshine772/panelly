@@ -49,7 +49,7 @@ RUN touch /usr/local/etc/php/conf.d/uploads.ini \
     && echo "upload_max_filesize = 10M;" >> /usr/local/etc/php/conf.d/uploads.ini
 
 # Install dependencies
-RUN composer install --no-interaction --no-scripts --no-suggest --no-progress \
+RUN composer update --no-interaction --no-scripts --no-suggest --no-progress \
     && npm install \
     && npm run dev
 
