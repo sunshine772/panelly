@@ -12,7 +12,11 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip
+    unzip \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    nodejs
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -31,11 +35,7 @@ RUN apt-get update && apt-get -y install nodejs
 WORKDIR /var/www
 
 # Install GD extension
-RUN apt-get update && apt-get install -y \
-        libfreetype6-dev \
-        libjpeg62-turbo-dev \
-        libpng-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd
 
 # Set working directory for Laravel
@@ -48,9 +48,11 @@ COPY . .
 RUN touch /usr/local/etc/php/conf.d/uploads.ini \
     && echo "upload_max_filesize = 10M;" >> /usr/local/etc/php/conf.d/uploads.ini
 
-# Serve the application
-RUN composer update
-RUN npm install
+# Install dependencies
+RUN composer install --no-interaction --no-scripts --no-suggest --no-progress \
+    && npm install \
+    && npm run dev
 
-# Start the application
-CMD php artisan migrate --force && php artisan storage:link && npm run dev --host=0.0.0.0 --port=$PORT & php artisan serve --host=0.0.0.0 --port=$PORT
+# Serve the application
+EXPOSE 80
+CMD ["apache2-foreground"]
