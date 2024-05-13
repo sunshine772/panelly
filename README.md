@@ -1,13 +1,13 @@
-<h1># Nombre del Proyecto</h1>
+<h1># Panelly</h1>
 
 <p>Breve descripción del proyecto.</p>
 
 <h2>Instalación</h2>
 
 <ol>
-  <li>Clona este repositorio: <code>git clone https://github.com/tu_usuario/tu_repositorio.git</code></li>
-  <li>Navega al directorio del proyecto: <code>cd nombre_del_directorio</code></li>
-  <li>Instala las dependencias: <code>composer install</code></li>
+  <li>Clona este repositorio: <code>git clone https://github.com/sunshine772/panelly.git</code></li>
+  <li>Navega al directorio del proyecto: <code>cd panelly</code></li>
+  <li>Instala las dependencias: <code>composer install o composer update</code></li>
   <li>Copia el archivo de configuración de entorno: <code>cp .env.example .env</code></li>
   <li>Genera la clave de la aplicación: <code>php artisan key:generate</code></li>
   <li>Configura tu archivo <code>.env</code> con los detalles de tu base de datos MySQL</li>
