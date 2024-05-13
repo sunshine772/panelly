@@ -37,4 +37,6 @@ DB_PASSWORD=contraseña_de_mysql
 <ol start="4">
   <li>Asegúrate de que Apache y MySQL estén iniciados en XAMPP.</li>
   <li>Ejecuta las migraciones de la base de datos: <code>php artisan migrate</code></li>
+    <li>Ejecuta las migraciones de la base de datos: <b>:)</b></li>
+
 </ol>
