@@ -1,3 +1,4 @@
+<script src="https://cdn.tailwindcss.com"></script>
 <x-guest-layout>
     <x-jet-authentication-card>
         <x-slot name="logo">
