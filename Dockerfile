@@ -1,11 +1,11 @@
-# Use the official PHP image with Apache
+# Usar la imagen base de PHP con Apache
 FROM php:8.1-apache
 
-# Arguments defined in docker-compose.yml
+# Argumentos definidos en docker-compose.yml
 ARG user
 ARG uid
 
-# Install system dependencies
+# Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -15,23 +15,23 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip
 
-# Clear cache
+# Limpiar la caché
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions
+# Instalar extensiones de PHP
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Get latest Composer
+# Obtener el último Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set up node and npm
+# Configurar node y npm
 RUN curl -sL https://deb.nodesource.com/setup_18.x | bash
 RUN apt-get update && apt-get -y install nodejs 
 
-# Set working directory
+# Establecer el directorio de trabajo
 WORKDIR /var/www
 
-# Install GD extension
+# Instalar la extensión GD
 RUN apt-get update && apt-get install -y \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
@@ -39,20 +39,20 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd
 
-# Set working directory for Laravel
+# Establecer el directorio de trabajo para Laravel
 WORKDIR /var/www/html
 
-# Copy project files
+# Copiar archivos del proyecto
 COPY . .
 
-# Install dependencies and compile assets
-RUN composer update
-RUN npm install
-RUN npm run build
-
-# Modify php.ini settings
+# Modificar la configuración php.ini
 RUN touch /usr/local/etc/php/conf.d/uploads.ini \
     && echo "upload_max_filesize = 10M;" >> /usr/local/etc/php/conf.d/uploads.ini
 
-# Start the application
-CMD php artisan migrate --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=$PORT
+# Servir la aplicación
+RUN composer update
+RUN npm install
+
+# Iniciar la aplicación
+CMD php artisan migrate --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=$PORT & npm run dev --host 0.0.0.0:3000
+
