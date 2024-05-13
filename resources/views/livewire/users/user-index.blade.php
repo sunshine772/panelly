@@ -11,6 +11,11 @@
                     {{ session('user-message') }}
                 </div>
                 @endif
+                @if (session()->has('error-message'))
+                <div class="alert alert-danger">
+                    {{ session('error-message') }}
+                </div>
+                @endif
             </div>
             <div class="card-header">
                 <div class="row">
@@ -95,7 +100,6 @@
                     </div>
                     <div class="modal-body">
                         <form>
-
                             <div class="form-group row">
                                 <label for="name" class="col-md-4 col-form-label text-md-right">{{ __('Nombre')
                                     }}</label>
@@ -192,8 +196,6 @@
                         @else
                         <button type="button" class="btn btn-success" wire:click="storeUser">Crear Usuario</button>
                         @endif
-
-
                     </div>
                 </div>
             </div>

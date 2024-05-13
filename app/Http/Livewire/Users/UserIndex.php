@@ -22,27 +22,32 @@ class UserIndex extends Component
 
     protected $rules = [
         'name' => 'required',
-        'last_name' => 'required',
-        'phone' => 'required',
-        'password' => 'required',
+        'last_name' => 'nullable',
         'email' => 'required|email',
+        'phone' => 'nullable',
+        'password' => 'required',
     ];
 
     public function storeUser()
     {
-        $this->validate();
+        if (empty($this->name) || empty($this->email) || empty($this->password)) {
+            $this->reset();
+            $this->dispatchBrowserEvent('modal', ['modalId' => '#userModal', 'actionModal' => 'hide']);
+            session()->flash('error-message', 'Por favor, complete todos los campos obligatorios.');
+            return;
+        } else {
+            User::create([
+                'name' => $this->name,
+                'last_name' => $this->last_name,
+                'email' => $this->email,
+                'phone' => $this->phone,
+                'password' => Hash::make($this->password),
+            ]);
 
-        User::create([
-            'name' => $this->name,
-            'last_name' => $this->last_name,
-            'email' => $this->email,
-            'phone' => $this->phone,
-            'password' => Hash::make($this->password),
-        ]);
-        $this->reset();
-        $this->dispatchBrowserEvent('modal', ['modalId' => '#userModal', 'actionModal' => 'hide']);
-
-        session()->flash('user-message', 'Usuario creado exitosamente');
+            $this->reset();
+            $this->dispatchBrowserEvent('modal', ['modalId' => '#userModal', 'actionModal' => 'hide']);
+            session()->flash('user-message', 'Usuario creado exitosamente');
+        }
     }
 
     public function showUserModal()
@@ -75,17 +80,29 @@ class UserIndex extends Component
 
     public function updateUser()
     {
-        $validated = $this->validate([
-            'name' => 'required',
-            'last_name' => 'required',
-            'email' => 'required|email',
-            'phone' => 'required',
-        ]);
+        if (empty($this->name) || empty($this->email)) {
+            $this->reset();
+            $this->dispatchBrowserEvent('modal', ['modalId' => '#userModal', 'actionModal' => 'hide']);
+            session()->flash('error-message', 'Por favor, complete los campos obligatorios.');
+            return;
+        }
+
         $user = User::find($this->userId);
-        $user->update($validated);
+        if (!$user) {
+            $this->reset();
+            $this->dispatchBrowserEvent('modal', ['modalId' => '#userModal', 'actionModal' => 'hide']);
+            session()->flash('error-message', 'Usuario no encontrado.');
+            return;
+        }
+
+        $user->name = $this->name;
+        $user->last_name = $this->last_name;
+        $user->email = $this->email;
+        $user->phone = $this->phone;
+        $user->save();
+
         $this->reset();
         $this->dispatchBrowserEvent('modal', ['modalId' => '#userModal', 'actionModal' => 'hide']);
-
         session()->flash('user-message', 'Usuario actualizado exitosamente');
     }
 
@@ -115,4 +132,3 @@ class UserIndex extends Component
         ])->layout('layouts.main');
     }
 }
-

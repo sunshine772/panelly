@@ -8,8 +8,7 @@
         </x-slot>
 
         <div class="mb-4 text-sm text-gray-600">
-            {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a
-            password reset link that will allow you to choose a new one.') }}
+            {{ __('¿Olvidaste tu contraseña? No hay problema. Solo indícanos tu dirección de correo electrónico y te enviaremos un enlace para restablecer tu contraseña.') }}
         </div>
 
         @if (session('status'))
@@ -24,7 +23,7 @@
             @csrf
 
             <div class="block">
-                <x-jet-label for="email" value="{{ __('Email') }}" />
+                <x-jet-label for="email" value="{{ __('Correo electrónico') }}" />
                 <x-jet-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')"
                     required autofocus />
             </div>
@@ -32,7 +31,7 @@
             <div class="mt-6">
                 <button type="submit"
                     class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    {{ __('Email Password Reset Link') }}
+                    {{ __('Enviar enlace de restablecimiento de contraseña') }}
                 </button>
             </div>
         </form>
