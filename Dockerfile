@@ -1,56 +1,102 @@
+# Primero, el Dockerfile para la construcción de assets y dependencias de PHP Composer:
+# Este Dockerfile está enfocado en la construcción de assets y dependencias de PHP Composer.
+
+# Utiliza la imagen oficial de Composer para instalar las dependencias de PHP.
+FROM composer:2.0 as vendor
+
+# Etiqueta la imagen como composer:2
+LABEL image=composer:2
+
+# Copia los archivos relacionados con la base de datos
+COPY database/ /app/database/
+
+# Copia los archivos composer.* al contenedor
+COPY composer.* /app/
+
+# Instala las dependencias de PHP
+RUN composer install \
+    --ignore-platform-reqs \
+    --no-interaction \
+    --no-scripts \
+    --prefer-dist \
+    --optimize-autoloader
+
+# A continuación, el Dockerfile para la construcción de assets de frontend:
+# Este Dockerfile se centra en la construcción de assets de frontend.
+
+# Utiliza la imagen oficial de Node.js para compilar assets de frontend.
+FROM node:14-alpine as frontend
+
+# Etiqueta la imagen como node:14
+LABEL image=node:14
+
+# Crea el directorio público en el contenedor
+RUN mkdir -p /app/public
+
+# Copia los archivos package.json, package-lock.json y webpack.mix.js al contenedor
+COPY package.json package-lock.json webpack.mix.js /app/
+
+# Copia los archivos JavaScript fuente
+COPY resources/ /app/resources/
+
+# Establece el directorio de trabajo en /app
+WORKDIR /app
+
+# Instala las dependencias de Node.js y compila los assets
+RUN npm ci && npm run prod
+
+# Finalmente, el Dockerfile principal que construye la imagen final del proyecto Laravel:
+# Este Dockerfile construye la imagen final del proyecto Laravel utilizando las dependencias y assets compilados en los pasos anteriores.
+
+# Utiliza la imagen oficial de PHP con Apache
 FROM php:8.1-apache
 
-# Arguments defined in docker-compose.yml
-ARG user
-ARG uid
+# Establece la variable de entorno TZ para la zona horaria
+ENV TZ=Asia/Kuala_Lumpur
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip
+# Crea un enlace simbólico para establecer la zona horaria
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# Establece el directorio raíz de Apache para que apunte a /var/www/html/public
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
+    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+# Instala las extensiones de PHP necesarias
+RUN docker-php-ext-install pdo_mysql bcmath pcntl posix \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && docker-php-ext-install ldap zip \
+    && apt-get update \
+    && apt-get install -y supervisor libldap2-dev nano libzip-dev zip mariadb-client \
+    && rm -rf /var/lib/apt/lists/* \
+    && docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/
 
-# Get latest Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Habilita los módulos de Apache
+RUN a2enmod rewrite headers
 
-# Set up node and npm
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash
-RUN apt-get update && apt-get -y install nodejs 
+# Reinicia el servicio de Apache
+RUN service apache2 restart
 
-# Set working directory
-WORKDIR /var/www
+# Copia el archivo de configuración de supervisord
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Install GD extension
-RUN apt-get update && apt-get install -y \
-        libfreetype6-dev \
-        libjpeg62-turbo-dev \
-        libpng-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd
+# Copia el archivo de configuración de LDAP
+COPY docker/ldap.conf /etc/ldap/ldap.conf
 
-# Set working directory for Laravel
-WORKDIR /var/www/html
+# Copia los archivos de configuración de PHP
+COPY docker/*.ini /usr/local/etc/php/conf.d/
 
-# Copy project files
-COPY . .
+# Copia los archivos de dependencias de Composer del contenedor 'vendor'
+COPY --from=vendor /app/vendor/ /var/www/html/vendor/
 
-# Modify php.ini settings
-RUN touch /usr/local/etc/php/conf.d/uploads.ini \
-    && echo "upload_max_filesize = 10M;" >> /usr/local/etc/php/conf.d/uploads.ini
+# Copia los archivos de assets de frontend del contenedor 'frontend'
+COPY --from=frontend /app/public/js/ /var/www/html/public/js/
+COPY --from=frontend /app/index.js /var/www/html/index.js
+COPY --from=frontend /app/mix-manifest.json /var/www/html/mix-manifest.json
 
-# Serve the application
-RUN composer update
-RUN npm install
+# Copia el resto de los archivos del proyecto al directorio /var/www/html en el contenedor
+COPY --chown=www-data:www-data . /var/www/html
 
-# Start the application
-CMD php artisan migrate --force && php artisan storage:link &&  php artisan serve --host=0.0.0.0 --port=$PORT
+# CMD predeterminado para iniciar supervisord
+CMD ["/usr/bin/supervisord"]
