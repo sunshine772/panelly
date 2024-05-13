@@ -49,6 +49,7 @@ RUN touch /usr/local/etc/php/conf.d/uploads.ini \
     && echo "upload_max_filesize = 10M;" >> /usr/local/etc/php/conf.d/uploads.ini
 
 # Serve the application
+RUN composer require livewire/livewire
 RUN composer update
 RUN npm install
 
