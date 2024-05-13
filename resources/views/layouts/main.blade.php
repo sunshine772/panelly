@@ -20,7 +20,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <!-- Custom styles for this template-->
-    {{-- <link href="{{ asset('css/sb-admin.min.css') }}" rel="stylesheet"> --}}
+    <link href="{{ asset('css/sb-admin.min.css') }}" rel="stylesheet">
     <link href="https://panelly.up.railway.app/css/sb-admin.min.css" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
