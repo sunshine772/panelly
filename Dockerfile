@@ -1,4 +1,3 @@
-# Primero, el Dockerfile para la construcción de assets y dependencias de PHP Composer:
 # Este Dockerfile está enfocado en la construcción de assets y dependencias de PHP Composer.
 
 # Utiliza la imagen oficial de Composer para instalar las dependencias de PHP.
@@ -34,7 +33,7 @@ LABEL image=node:14
 RUN mkdir -p /app/public
 
 # Copia los archivos package.json, package-lock.json y webpack.mix.js al contenedor
-COPY package.json package-lock.json webpack.mix.js /app/
+COPY package.json package-lock.json vite.config.js /app/
 
 # Copia los archivos JavaScript fuente
 COPY resources/ /app/resources/
