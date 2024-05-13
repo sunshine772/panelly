@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Dashboard</title>
+    <title>Panelly</title>
 
     <!-- Custom fonts for this template-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
@@ -20,7 +20,8 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <!-- Custom styles for this template-->
-    <link href="{{ asset('css/sb-admin.min.css') }}" rel="stylesheet">
+    {{-- <link href="{{ asset('css/sb-admin.min.css') }}" rel="stylesheet"> --}}
+    <link href="https://panelly.up.railway.app/css/sb-admin.min.css" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
     @livewireStyles
