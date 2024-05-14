@@ -1,4 +1,5 @@
-@vite(['resources/css/app.css', 'resources/js/app.js'])
+<script src="https://cdn.tailwindcss.com"></script>
+@livewireStyles
 <x-guest-layout>
     <x-jet-authentication-card>
         <x-slot name="logo">

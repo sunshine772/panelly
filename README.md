@@ -7,12 +7,12 @@
 <ol>
   <li>Clona este repositorio: <code>git clone https://github.com/sunshine772/panelly.git</code></li>
   <li>Navega al directorio del proyecto: <code>cd panelly</code></li>
-  <li>Instala las dependencias: <code>composer install o composer update</code></li>
+  <li>Instala las dependencias de PHP: <code>composer install</code> o <code>composer update</code></li>
   <li>Copia el archivo de configuración de entorno: <code>cp .env.example .env</code></li>
   <li>Genera la clave de la aplicación: <code>php artisan key:generate</code></li>
   <li>Configura tu archivo <code>.env</code> con los detalles de tu base de datos MySQL</li>
   <li>Ejecuta las migraciones de la base de datos: <code>php artisan migrate</code></li>
-  <li>Inicia el servidor de desarrollo: <code>php artisan serve</code></li>
+  <li>Para iniciar el servidor de desarrollo, ejecuta: <code>php artisan serve</code> y en otra consola ejecuta: <code>npm run dev</code></li>
 </ol>
 
 <h2>Configuración con XAMPP</h2>
@@ -37,6 +37,4 @@ DB_PASSWORD=contraseña_de_mysql
 <ol start="4">
   <li>Asegúrate de que Apache y MySQL estén iniciados en XAMPP.</li>
   <li>Ejecuta las migraciones de la base de datos: <code>php artisan migrate</code></li>
-    <li>Ejecuta las migraciones de la base de datos: <b>:)</b></li>
-
 </ol>
